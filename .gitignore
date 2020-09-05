@@ -8,3 +8,4 @@ categories*.json
 
 __pycache__/
 .DS_Store
+.vscode/*
