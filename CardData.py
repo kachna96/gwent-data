@@ -2,8 +2,6 @@
 import re
 import GwentUtils
 
-IMAGE_SIZES = ['original', 'high', 'medium', 'low', 'thumbnail']
-
 """
 Constants from Gwent Client.
 """
@@ -85,7 +83,7 @@ CARD_SETS = {
 # Gaunter's 'Higher than 5' and 'Lower than 5' are not actually cards.
 INVALID_TOKENS = ['200175', '200176']
 
-def create_card_json(gwent_data_helper, patch, base_image_url):
+def create_card_json(gwent_data_helper):
     cards = {}
 
     card_templates = gwent_data_helper.card_templates
@@ -194,14 +192,6 @@ def create_card_json(gwent_data_helper, patch, base_image_url):
         art_id = template.attrib.get('ArtId')
         if art_id != None:
             art['ingameArtId'] = art_id
-
-        if collectible or card_id == "202140": # Get card art for Tactical Advantage
-            for image_size in IMAGE_SIZES:
-                art[image_size] = base_image_url.replace("{patch}", patch) \
-                    .replace("{cardId}", card_id) \
-                    .replace("{variationId}", variation_id) \
-                    .replace("{size}", image_size) \
-                    .replace("{artId}", art_id)
 
         variation['art'] = art
 

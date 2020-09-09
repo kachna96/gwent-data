@@ -11,27 +11,14 @@ import CategoryData
 
 parser = argparse.ArgumentParser(description="Transform the Gwent card data contained in xml files into a "
                                              "standardised JSON format. See README for more info.",
-                                 epilog="Usage example:\n./master_xml.py ./pathToXML v0-9-10",
                                  formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("inputFolder", help="unzipped data_definitions.zip. Folder containing the xml files.")
-parser.add_argument("-p", "--patch", help="Specifies the Gwent patch version. Used to create image urls.")
-parser.add_argument("-i", "--images", help="Base image url to use for card images. See README for more info.")
 parser.add_argument("-l", "--language", help="Includes just the translations for the selected language. Results in much smaller json files. Choose from: en-US, de-DE, es-ES, es-MX, fr-FR, it-IT, ja-JP, ko-KR, pl-PL, pt-BR, ru-RU, zh-CN, zh-TW")
 args = parser.parse_args()
-patch = args.patch
 rawFolder = args.inputFolder
-base_image_url = args.images
 locale = args.language
 if locale:
     GwentUtils.LOCALES = [locale]
-if not base_image_url:
-    base_image_url = "https://firebasestorage.googleapis.com/v0/b/gwent-9e62a.appspot.com/o/images%2F{patch}%2F{cardId}%2F{variationId}%2F{size}.png?alt=media"
-    if not patch:
-        exit("Error: If you are not supplying an image url, you need to specify the patch name using --patch.\n"
-            "This is because the default image url uses the patch name to generate the image url.\n"
-            "See README for more info.")
-elif "{patch}" in base_image_url and not patch:
-    exit("Your image url contains {patch} but you have not supplied a patch name using -p. See README for more info")
 
 # Add a backslash on the end if it doesn't exist.
 if rawFolder[-1] != "/":
@@ -43,8 +30,7 @@ if not os.path.isdir(rawFolder):
 
 gwentDataHelper = GwentUtils.GwentDataHelper(rawFolder)
 
-# Save under v0-9-10_2017-09-05.json if the script is ran on 5 September 2017 with patch v0-9-10.
-BASE_FILENAME = patch + "_" + datetime.utcnow().strftime("%Y-%m-%d") + ".json"
+BASE_FILENAME = datetime.utcnow().strftime("%Y-%m-%d") + ".json"
 
 print("Creating keyword JSON...")
 keywordsJson = KeywordData.create_keyword_json(gwentDataHelper)
@@ -59,7 +45,7 @@ filepath = os.path.join(rawFolder + "../" + filename)
 GwentUtils.save_json(filepath, categoriesJson)
 
 print("Creating card data JSON...")
-cardsJson = CardData.create_card_json(gwentDataHelper, patch, base_image_url)
+cardsJson = CardData.create_card_json(gwentDataHelper)
 filename = "cards_" + BASE_FILENAME
 filepath = os.path.join(rawFolder + "../" + filename)
 print("Found %s cards." % (len(cardsJson)))
