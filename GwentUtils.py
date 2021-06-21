@@ -81,10 +81,13 @@ def _get_evaluated_tooltips(raw_tooltips, card_names, card_abilities, card_templ
         # Now replace all the other card abilities.
         # Regex. Get all strings that lie between a '{' and '}'.
         result = re.findall(r'.*?\{(.*?)\}.*?', tooltips[card_id])
+
         for key in result:
             ability_value = _get_card_ability_value(card_abilities, card_id, key)
             if ability_value is not None:
                 tooltips[card_id] = tooltips[card_id].replace("{" + key + "}", ability_value)
+                if key == 'Adrenaline':
+                    tooltips[card_id] = tooltips[card_id].replace("{" + key + "-1}", str(int(ability_value) - 1))
 
     return tooltips
 
